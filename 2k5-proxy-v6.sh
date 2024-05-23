@@ -7,11 +7,11 @@ random() {
 }
 
 array=(1 2 3 4 5 6 7 8 9 0 a b c d e f)
-gen56() {
-	ip56() {
+gen64() {
+	ip64() {
 		echo "${array[$RANDOM % 16]}${array[$RANDOM % 16]}${array[$RANDOM % 16]}${array[$RANDOM % 16]}"
 	}
-	echo "$1:$(ip56):$(ip56):$(ip56):$(ip56)"
+	echo "$1:$(ip64):$(ip64):$(ip64):$(ip64)"
 }
 install_3proxy() {
     echo "installing 3proxy"
@@ -63,10 +63,8 @@ EOF
 
 
 gen_data() {
-    userproxy=bivnw
-    passproxy=bivnw
     seq $FIRST_PORT $LAST_PORT | while read port; do
-        echo "$userproxy/$passproxy/$IP4/$port/$(gen56 $IP6)"
+        echo "user$port/$(random)/$IP4/$port/$(gen64 $IP6)"
     done
 }
 
@@ -78,7 +76,7 @@ EOF
 
 gen_ifconfig() {
     cat <<EOF
-$(awk -F "/" '{print "ifconfig eth0 inet6 add " $5 "/56"}' ${WORKDATA})
+$(awk -F "/" '{print "ifconfig eth0 inet6 add " $5 "/64"}' ${WORKDATA})
 EOF
 }
 echo "installing apps"
@@ -114,7 +112,7 @@ while :; do
     echo "Number out of range, try again"
   fi
 done
-LAST_PORT=$(($FIRST_PORT + 2999))
+LAST_PORT=$(($FIRST_PORT + 2499))
 echo "LAST_PORT is $LAST_PORT. Continue..."
 
 gen_data >$WORKDIR/data.txt
